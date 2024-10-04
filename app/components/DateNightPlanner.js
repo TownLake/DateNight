@@ -12,7 +12,7 @@ const DateNightPlanner = () => {
     location: [],
     watch: [],
     genre: [],
-    physical-connection-intimacy: []
+    physical_connection_intimacy: []
   });
   const [uniqueId, setUniqueId] = useState('');
   const [partnerSubmitted, setPartnerSubmitted] = useState(false);
@@ -235,7 +235,7 @@ const DateNightPlanner = () => {
               
               <Section
                 title="❤️ Let's Get Physical?"
-                category="physical-connection-intimacy"
+                category="physical_connection_intimacy"
                 options={[
                   ['Pass', '🙅'],
                   ['Snuggle', '🤗'],
