@@ -92,8 +92,8 @@ const DateNightPlanner = () => {
       className={`p-2 m-1 rounded-full text-sm ${
         preferences[category].includes(item)
           ? 'bg-indigo-500 text-white'
-          : 'bg-gray-200 text-gray-700'
-      } hover:bg-indigo-400 transition-colors duration-200 ${
+          : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200'
+      } hover:bg-indigo-400 hover:text-white transition-colors duration-200 ${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       }`}
       disabled={disabled}
@@ -108,7 +108,7 @@ const DateNightPlanner = () => {
 
     return (
       <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">{title}</h2>
+        <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">{title}</h2>
         <div className="flex flex-wrap">
           {options.map(([item, emoji]) => (
             <Option key={item} category={category} item={item} emoji={emoji} disabled={isEatInOrTakeOut && category === 'go' && item !== 'Home'} />
@@ -116,7 +116,7 @@ const DateNightPlanner = () => {
         </div>
         {subgroup && (
           <div className={`mt-2 ml-4 ${isNoScreens ? 'opacity-50' : ''}`}>
-            <h3 className="text-md font-medium mb-1">{subgroup}</h3>
+            <h3 className="text-md font-medium mb-1 text-gray-700 dark:text-gray-300">{subgroup}</h3>
             <div className="flex flex-wrap">
               {subgroupOptions.map(([item, emoji]) => (
                 <Option 
@@ -135,29 +135,29 @@ const DateNightPlanner = () => {
   };
 
   const Footer = () => (
-    <footer className="text-center text-gray-400 text-sm mt-4 pb-4">
+    <footer className="text-center text-gray-400 dark:text-gray-500 text-sm mt-4 pb-4">
       <p>
-        <a href="https://blog.samrhea.com/category/walkthrough/" className="hover:underline">Built with love on Cloudflare Workers</a> by <a href="https://blog.samrhea.com/pages/about/" className="hover:underline">Sam Rhea</a>.
+        <a href="https://blog.samrhea.com/category/walkthrough/" className="hover:underline">Built</a> with love on Cloudflare Workers by <a href="https://blog.samrhea.com/pages/about/" className="hover:underline">Sam Rhea</a>.
       </p>
     </footer>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 p-8 flex flex-col">
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8 mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 p-8 flex flex-col">
+      <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-4">
         {partnerSubmitted ? (
           <>
-            <h1 className="text-3xl font-bold text-center mb-4 text-indigo-600">Your Date Night Plan</h1>
-            <ReactMarkdown className="prose max-w-none">
+            <h1 className="text-3xl font-bold text-center mb-4 text-indigo-600 dark:text-indigo-400">Your Date Night Plan</h1>
+            <ReactMarkdown className="prose dark:prose-invert max-w-none">
               {datePlan}
             </ReactMarkdown>
           </>
         ) : (
           <>
-            <h1 className="text-3xl font-bold text-center mb-2 text-indigo-600">
+            <h1 className="text-3xl font-bold text-center mb-2 text-indigo-600 dark:text-indigo-400">
               {uniqueId ? "Add Your Date Night Preferences" : "Let's Plan Date Night"}
             </h1>
-            <p className="text-center text-gray-600 mb-6">
+            <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
               {uniqueId 
                 ? "Your partner has already submitted their preferences. Finish planning date night by submitting yours!"
                 : "Select your preferences, share the link generated with your partner so they can input theirs, and then our AI will create a date night itinerary."}
@@ -212,7 +212,7 @@ const DateNightPlanner = () => {
                 ]}
               />
 
-              {error && <p className="text-red-500 text-center">{error}</p>}
+              {error && <p className="text-red-500 dark:text-red-400 text-center">{error}</p>}
 
               <button
                 type="submit"
