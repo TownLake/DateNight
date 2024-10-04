@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Send } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 const WORKER_URL = 'https://date-night-planner.samrhea.workers.dev';
 
@@ -64,7 +65,8 @@ const DateNightPlanner = () => {
         if (!response.ok) throw new Error('Failed to submit preferences');
         const { id } = await response.json();
         setUniqueId(id);
-        alert(`Share this URL with your partner: ${window.location.origin}?id=${id}`);
+        const uniqueUrl = `${window.location.origin}?id=${id}`;
+        alert(`Share this URL with your partner: ${uniqueUrl}`);
       } else {
         // Partner submission
         const response = await fetch(`${WORKER_URL}/generate-plan`, {
@@ -147,7 +149,9 @@ const DateNightPlanner = () => {
       <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 p-8">
         <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
           <h1 className="text-3xl font-bold text-center mb-4 text-indigo-600">Your Date Night Plan</h1>
-          <p className="whitespace-pre-wrap">{datePlan}</p>
+          <ReactMarkdown className="prose max-w-none">
+            {datePlan}
+          </ReactMarkdown>
         </div>
       </div>
     );
