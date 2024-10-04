@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Send } from 'lucide-react';
 
+const WORKER_URL = 'https://date-night-planner.samrhea.workers.dev';
+
 const DateNightPlanner = () => {
   const [preferences, setPreferences] = useState({
     eat: [],
@@ -13,6 +15,19 @@ const DateNightPlanner = () => {
     watch: [],
     genre: []
   });
+  const [uniqueId, setUniqueId] = useState('');
+  const [partnerSubmitted, setPartnerSubmitted] = useState(false);
+  const [datePlan, setDatePlan] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    if (id) {
+      setUniqueId(id);
+    }
+  }, []);
 
   useEffect(() => {
     if (preferences.watch.includes('No Screens')) {
@@ -33,10 +48,40 @@ const DateNightPlanner = () => {
     setPreferences(prev => ({ ...prev, [category]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitted preferences:', preferences);
-    // Here you would typically send the data to your backend
+    setIsLoading(true);
+    setError('');
+
+    try {
+      if (!uniqueId) {
+        // First submission
+        const response = await fetch(`${WORKER_URL}/submit-preferences`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ preferences })
+        });
+        if (!response.ok) throw new Error('Failed to submit preferences');
+        const { id } = await response.json();
+        setUniqueId(id);
+        alert(`Share this URL with your partner: ${window.location.origin}?id=${id}`);
+      } else {
+        // Partner submission
+        const response = await fetch(`${WORKER_URL}/generate-plan`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: uniqueId, partnerPreferences: preferences })
+        });
+        if (!response.ok) throw new Error('Failed to generate plan');
+        const { plan } = await response.json();
+        setDatePlan(plan);
+        setPartnerSubmitted(true);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const Option = ({ category, item, emoji, disabled = false }) => (
@@ -97,12 +142,27 @@ const DateNightPlanner = () => {
     );
   };
 
+  if (partnerSubmitted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 p-8">
+        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
+          <h1 className="text-3xl font-bold text-center mb-4 text-indigo-600">Your Date Night Plan</h1>
+          <p className="whitespace-pre-wrap">{datePlan}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 p-8">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-2 text-indigo-600">Let's Plan Date Night</h1>
+        <h1 className="text-3xl font-bold text-center mb-2 text-indigo-600">
+          {uniqueId ? "Partner's Date Night Preferences" : "Let's Plan Date Night"}
+        </h1>
         <p className="text-center text-gray-600 mb-6">
-          Select your preferences, your partner can select theirs without seeing yours, and then Cloudflare AI will compare the two and create a date night itinerary.
+          {uniqueId 
+            ? "Your partner has already submitted their preferences. Now it's your turn!"
+            : "Select your preferences, your partner can select theirs without seeing yours, and then our AI will create a date night itinerary."}
         </p>
         <form onSubmit={handleSubmit} className="space-y-6">
           <Section
@@ -158,12 +218,19 @@ const DateNightPlanner = () => {
             ]}
           />
 
+          {error && <p className="text-red-500 text-center">{error}</p>}
+
           <button
             type="submit"
             className="w-full bg-indigo-500 text-white p-3 rounded-lg hover:bg-indigo-600 transition-colors duration-200 flex items-center justify-center"
+            disabled={isLoading}
           >
-            <Send className="mr-2" size={20} />
-            Submit Preferences
+            {isLoading ? (
+              <span className="animate-spin mr-2">🔄</span>
+            ) : (
+              <Send className="mr-2" size={20} />
+            )}
+            {isLoading ? 'Processing...' : 'Submit Preferences'}
           </button>
         </form>
       </div>
