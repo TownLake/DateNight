@@ -9,10 +9,10 @@ const WORKER_URL = 'https://date-night-planner.samrhea.workers.dev';
 const DateNightPlanner = () => {
   const [preferences, setPreferences] = useState({
     eat: [],
-    go: [],
+    location: [],
     watch: [],
     genre: [],
-    connect: []
+    physical-connection-intimacy: []
   });
   const [uniqueId, setUniqueId] = useState('');
   const [partnerSubmitted, setPartnerSubmitted] = useState(false);
@@ -207,7 +207,7 @@ const DateNightPlanner = () => {
               
               <Section
                 title="🚶 Let's Go"
-                category="go"
+                category="location"
                 options={[
                   ['Dancing', '💃'],
                   ['Strolling', '🚶‍♀️'],
@@ -235,7 +235,7 @@ const DateNightPlanner = () => {
               
               <Section
                 title="❤️ Let's Get Physical?"
-                category="connect"
+                category="physical-connection-intimacy"
                 options={[
                   ['Pass', '🙅'],
                   ['Snuggle', '🤗'],
