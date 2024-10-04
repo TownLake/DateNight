@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 const WORKER_URL = 'https://date-night-planner.samrhea.workers.dev';
@@ -19,6 +19,8 @@ const DateNightPlanner = () => {
   const [datePlan, setDatePlan] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [uniqueUrl, setUniqueUrl] = useState('');
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -65,8 +67,8 @@ const DateNightPlanner = () => {
         if (!response.ok) throw new Error('Failed to submit preferences');
         const { id } = await response.json();
         setUniqueId(id);
-        const uniqueUrl = `${window.location.origin}?id=${id}`;
-        alert(`Share this URL with your partner: ${uniqueUrl}`);
+        const newUniqueUrl = `${window.location.origin}?id=${id}`;
+        setUniqueUrl(newUniqueUrl);
       } else {
         // Partner submission
         const response = await fetch(`${WORKER_URL}/generate-plan`, {
@@ -84,6 +86,13 @@ const DateNightPlanner = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(uniqueUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // Reset copied state after 2 seconds
+    });
   };
 
   const Option = ({ category, item, emoji, disabled = false }) => (
@@ -137,7 +146,7 @@ const DateNightPlanner = () => {
   const Footer = () => (
     <footer className="text-center text-gray-400 dark:text-gray-500 text-sm mt-4 pb-4">
       <p>
-        <a href="https://blog.samrhea.com/category/walkthrough/" className="hover:underline">Built</a> with love on Cloudflare Workers by <a href="https://blog.samrhea.com/pages/about/" className="hover:underline">Sam Rhea</a>.
+        <a href="https://blog.samrhea.com/category/walkthrough/" className="hover:underline">Built with love on Cloudflare Workers</a> by <a href="https://blog.samrhea.com/pages/about/" className="hover:underline">Sam Rhea</a>.
       </p>
     </footer>
   );
@@ -152,15 +161,38 @@ const DateNightPlanner = () => {
               {datePlan}
             </ReactMarkdown>
           </>
+        ) : uniqueUrl ? (
+          <>
+            <h1 className="text-3xl font-bold text-center mb-4 text-indigo-600 dark:text-indigo-400">Share with Your Partner</h1>
+            <p className="text-center text-gray-600 dark:text-gray-400 mb-4">
+              Share this link with your partner to plan your date night together:
+            </p>
+            <div className="flex items-center justify-center mb-6">
+              <input
+                type="text"
+                value={uniqueUrl}
+                readOnly
+                className="flex-grow p-2 border rounded-l-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+              />
+              <button
+                onClick={copyToClipboard}
+                className="p-2 bg-indigo-500 text-white rounded-r-md hover:bg-indigo-600 transition-colors duration-200 flex items-center"
+              >
+                {copied ? <Check size={20} /> : <Copy size={20} />}
+                <span className="ml-2">{copied ? 'Copied!' : 'Copy'}</span>
+              </button>
+            </div>
+            <p className="text-center text-gray-600 dark:text-gray-400">
+              We'll generate a plan for the two of you once they submit their plans.
+            </p>
+          </>
         ) : (
           <>
             <h1 className="text-3xl font-bold text-center mb-2 text-indigo-600 dark:text-indigo-400">
-              {uniqueId ? "Add Your Date Night Preferences" : "Let's Plan Date Night"}
+              Let's Plan Date Night
             </h1>
             <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
-              {uniqueId 
-                ? "Your partner has already submitted their preferences. Finish planning date night by submitting yours!"
-                : "Select your preferences, share the link generated with your partner so they can input theirs, and then our AI will create a date night itinerary."}
+              Select your preferences, click submit, and we'll generate a unique link for your partner to add theirs.
             </p>
             <form onSubmit={handleSubmit} className="space-y-6">
               <Section
