@@ -118,14 +118,14 @@ async function handleGeneratePlan(request, corsHeaders) {
 async function generateDatePlan(preferences) {
   const API_ENDPOINT = 'https://gateway.ai.cloudflare.com/v1/eca95c4515a39540cafc79d7b2561a25/date-night/workers-ai/@cf/meta/llama-3.1-70b-instruct-preview'
   
-  const systemPrompt = `You are a date night planner. Create a fun and romantic date night plan based on the preferences of two people. Be creative and specific in your suggestions. The plan should include activities for eating, going out (or staying in), connecting, and watching (if applicable). Make sure to consider both partners' preferences and find a balance between them.`
+  const systemPrompt = `You are a date night planner helping two romantic partners based on both of their preferences. First, give the date night a title based on the plan. Second, write an itinerary compromising on their preferences. If one partner says "Pass" for physical intimacy, do not recommend any physical intimacy at all regardless of the other partner submission. Make sure to consider both partners' preferences and find a balance between them.`
 
   const userPrompt = `Here are the preferences for two partners:
   
   Partner 1: ${JSON.stringify(preferences.user1)}
   Partner 2: ${JSON.stringify(preferences.user2)}
   
-  Please create a detailed date night plan that takes into account both partners' preferences. Include specific suggestions for food, activities, and ways to connect. If they've chosen to watch something, include a specific recommendation that fits their preferred genre(s).`
+  Draft the date night plan.`
 
   try {
     const response = await fetch(API_ENDPOINT, {
