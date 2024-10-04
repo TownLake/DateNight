@@ -161,12 +161,12 @@ const DateNightPlanner = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 p-8">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
         <h1 className="text-3xl font-bold text-center mb-2 text-indigo-600">
-          {uniqueId ? "Partner's Date Night Preferences" : "Let's Plan Date Night"}
+          {uniqueId ? "Add Your Date Night Preferences" : "Let's Plan Date Night"}
         </h1>
         <p className="text-center text-gray-600 mb-6">
           {uniqueId 
-            ? "Your partner has already submitted their preferences. Now it's your turn!"
-            : "Select your preferences, your partner can select theirs without seeing yours, and then our AI will create a date night itinerary."}
+            ? "Your partner has already submitted their preferences. Finish planning date night by submitting yours!"
+            : "Select your preferences, share the link generated with your partner so they can input theirs, and then our AI will create a date night itinerary."}
         </p>
         <form onSubmit={handleSubmit} className="space-y-6">
           <Section
