@@ -175,7 +175,7 @@ const DateNightPlanner = () => {
   const Footer = React.memo(() => (
     <footer className="text-center text-gray-400 dark:text-gray-500 text-sm mt-4 pb-4">
       <p>
-        <a href="https://blog.samrhea.com/category/walkthrough/" className="hover:underline">Built with love on Cloudflare Workers</a> by <a href="https://blog.samrhea.com/pages/about/" className="hover:underline">Sam Rhea</a>.
+        <a href="https://blog.samrhea.com/category/walkthrough/" className="hover:underline">Built with love on Cloudflare Workers</a> by <a href="https://github.com/TownLake/DateNight" className="hover:underline">Sam Rhea</a>.
       </p>
     </footer>
   ));
