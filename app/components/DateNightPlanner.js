@@ -38,20 +38,15 @@ const DateNightPlanner = () => {
     }
   }, [preferences.watch]);
 
-  // Removed the effect that was changing location based on eat preferences
-
   const handleMultiSelect = useCallback((category, item) => {
     setPreferences(prev => {
       if (category === 'physical_connection_intimacy') {
         if (item === 'No Thanks') {
-          // If "No Thanks" is already selected, unselect it
           if (prev[category].includes('No Thanks')) {
             return { ...prev, [category]: [] };
           }
-          // Otherwise, select only "No Thanks"
           return { ...prev, [category]: ['No Thanks'] };
         } else {
-          // If selecting an option other than "No Thanks", remove "No Thanks" if it's selected
           return {
             ...prev,
             [category]: prev[category].includes(item)
@@ -61,7 +56,6 @@ const DateNightPlanner = () => {
         }
       }
 
-      // For other categories, keep the existing behavior
       return {
         ...prev,
         [category]: prev[category].includes(item)
@@ -181,8 +175,8 @@ const DateNightPlanner = () => {
   ));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 p-8 flex flex-col">
-      <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 p-4 sm:p-8 flex flex-col">
+      <div className="max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-8 mb-4">
         {partnerSubmitted ? (
           <>
             <h1 className="text-3xl font-bold text-center mb-4 text-indigo-600 dark:text-indigo-400">Your Date Night Plan</h1>
@@ -192,27 +186,27 @@ const DateNightPlanner = () => {
           </>
         ) : uniqueUrl ? (
           <>
-            <h1 className="text-3xl font-bold text-center mb-4 text-indigo-600 dark:text-indigo-400">Share with Your Partner</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4 text-indigo-600 dark:text-indigo-400">Share with Your Partner</h1>
             <p className="text-center text-gray-600 dark:text-gray-400 mb-4">
-              Share this link with your partner to plan your date night together:
+              Share this link with your partner:
             </p>
             <div className="flex items-center justify-center mb-6">
               <input
                 type="text"
                 value={uniqueUrl}
                 readOnly
-                className="flex-grow p-2 border rounded-l-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                className="w-32 sm:w-48 p-2 border rounded-l-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 truncate"
               />
               <button
                 onClick={copyToClipboard}
                 className="p-2 bg-indigo-500 text-white rounded-r-md hover:bg-indigo-600 transition-colors duration-200 flex items-center"
               >
                 {copied ? <Check size={20} /> : <Copy size={20} />}
-                <span className="ml-2">{copied ? 'Copied!' : 'Copy'}</span>
+                <span className="ml-2 hidden sm:inline">{copied ? 'Copied!' : 'Copy'}</span>
               </button>
             </div>
             <p className="text-center text-gray-600 dark:text-gray-400">
-              We'll generate a plan for the two of you once they submit their plans.
+              We'll generate a plan once they submit their preferences.
             </p>
           </>
         ) : (
