@@ -45,12 +45,22 @@ const DateNightPlanner = () => {
   }, [preferences.eat]);
 
   const handleMultiSelect = useCallback((category, item) => {
-    setPreferences(prev => ({
-      ...prev,
-      [category]: prev[category].includes(item)
-        ? prev[category].filter(i => i !== item)
-        : [...prev[category], item]
-    }));
+    setPreferences(prev => {
+      if (category === 'physical_connection_intimacy') {
+        if (item === 'No Thanks') {
+          return { ...prev, [category]: ['No Thanks'] };
+        } else if (prev[category].includes('No Thanks')) {
+          return { ...prev, [category]: [item] };
+        }
+      }
+
+      return {
+        ...prev,
+        [category]: prev[category].includes(item)
+          ? prev[category].filter(i => i !== item)
+          : [...prev[category], item]
+      };
+    });
   }, []);
 
   const handleSubmit = async (e) => {
@@ -119,6 +129,7 @@ const DateNightPlanner = () => {
   const Section = React.memo(({ title, category, options, subgroup, subgroupOptions }) => {
     const isNoScreens = category === 'watch' && preferences.watch.includes('No Screens');
     const isEatInOrTakeOut = category === 'location' && (preferences.eat.includes('Cook Together') || preferences.eat.includes('Take Out'));
+    const isNoThanksSelected = category === 'physical_connection_intimacy' && preferences.physical_connection_intimacy.includes('No Thanks');
 
     return (
       <div className="mb-6">
@@ -130,7 +141,8 @@ const DateNightPlanner = () => {
               category={category} 
               item={item} 
               emoji={emoji} 
-              disabled={isEatInOrTakeOut && category === 'location' && item !== 'Home'} 
+              disabled={(isEatInOrTakeOut && category === 'location' && item !== 'Home') ||
+                        (isNoThanksSelected && category === 'physical_connection_intimacy' && item !== 'No Thanks')}
             />
           ))}
         </div>
@@ -176,7 +188,7 @@ const DateNightPlanner = () => {
           <>
             <h1 className="text-3xl font-bold text-center mb-4 text-indigo-600 dark:text-indigo-400">Share with Your Partner</h1>
             <p className="text-center text-gray-600 dark:text-gray-400 mb-4">
-              Share this link with your partner to finish planning your date night together:
+              Share this link with your partner to plan your date night together:
             </p>
             <div className="flex items-center justify-center mb-6">
               <input
@@ -194,16 +206,16 @@ const DateNightPlanner = () => {
               </button>
             </div>
             <p className="text-center text-gray-600 dark:text-gray-400">
-              We'll generate a plan for the two of you once they submit their preferences.
+              We'll generate a plan for the two of you once they submit their plans.
             </p>
           </>
         ) : (
           <>
             <h1 className="text-3xl font-bold text-center mb-2 text-indigo-600 dark:text-indigo-400">
-              Plan-a-Date
+              Let's Plan Date Night
             </h1>
             <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
-              Select your preferences, click submit, and Plan-a-Date will generate a link you can share with your partner to add theirs.
+              Select your preferences, click submit, and we'll generate a unique link for your partner to add theirs.
             </p>
             <form onSubmit={handleSubmit} className="space-y-6">
               <Section
@@ -248,7 +260,7 @@ const DateNightPlanner = () => {
                 title="❤️ Let's Get Physical?"
                 category="physical_connection_intimacy"
                 options={[
-                  ['Pass', '🙅'],
+                  ['No Thanks', '🙅'],
                   ['Snuggle', '🤗'],
                   ['Make Out', '💏'],
                   ['Hot and Heavy', '🔥']
