@@ -48,12 +48,24 @@ const DateNightPlanner = () => {
     setPreferences(prev => {
       if (category === 'physical_connection_intimacy') {
         if (item === 'No Thanks') {
+          // If "No Thanks" is already selected, unselect it
+          if (prev[category].includes('No Thanks')) {
+            return { ...prev, [category]: [] };
+          }
+          // Otherwise, select only "No Thanks"
           return { ...prev, [category]: ['No Thanks'] };
-        } else if (prev[category].includes('No Thanks')) {
-          return { ...prev, [category]: [item] };
+        } else {
+          // If selecting an option other than "No Thanks", remove "No Thanks" if it's selected
+          return {
+            ...prev,
+            [category]: prev[category].includes(item)
+              ? prev[category].filter(i => i !== item)
+              : [...prev[category].filter(i => i !== 'No Thanks'), item]
+          };
         }
       }
 
+      // For other categories, keep the existing behavior
       return {
         ...prev,
         [category]: prev[category].includes(item)
@@ -279,7 +291,7 @@ const DateNightPlanner = () => {
                 ) : (
                   <Send className="mr-2" size={20} />
                 )}
-                {isLoading ? 'Processing...' : 'Submit Preferences'}
+                {isLoading ? 'Writing up a date night plan...' : 'Submit Preferences'}
               </button>
             </form>
           </>
