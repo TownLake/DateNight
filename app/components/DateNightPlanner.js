@@ -1,19 +1,21 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Send, Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 const WORKER_URL = 'https://date-night-planner.samrhea.workers.dev';
 
+const initialPreferences = {
+  eat: [],
+  location: [],
+  watch: [],
+  genre: [],
+  physical_connection_intimacy: []
+};
+
 const DateNightPlanner = () => {
-  const [preferences, setPreferences] = useState({
-    eat: [],
-    location: [],
-    watch: [],
-    genre: [],
-    physical_connection_intimacy: []
-  });
+  const [preferences, setPreferences] = useState(initialPreferences);
   const [uniqueId, setUniqueId] = useState('');
   const [partnerSubmitted, setPartnerSubmitted] = useState(false);
   const [datePlan, setDatePlan] = useState('');
@@ -38,18 +40,18 @@ const DateNightPlanner = () => {
 
   useEffect(() => {
     if (preferences.eat.includes('Cook Together') || preferences.eat.includes('Take Out')) {
-      setPreferences(prev => ({ ...prev, go: ['Home'] }));
+      setPreferences(prev => ({ ...prev, location: ['Home'] }));
     }
   }, [preferences.eat]);
 
-  const handleMultiSelect = (category, item) => {
+  const handleMultiSelect = useCallback((category, item) => {
     setPreferences(prev => ({
       ...prev,
       [category]: prev[category].includes(item)
         ? prev[category].filter(i => i !== item)
         : [...prev[category], item]
     }));
-  };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,45 +59,48 @@ const DateNightPlanner = () => {
     setError('');
 
     try {
-      if (!uniqueId) {
-        // First submission
-        const response = await fetch(`${WORKER_URL}/submit-preferences`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ preferences })
-        });
-        if (!response.ok) throw new Error('Failed to submit preferences');
-        const { id } = await response.json();
-        setUniqueId(id);
-        const newUniqueUrl = `${window.location.origin}?id=${id}`;
-        setUniqueUrl(newUniqueUrl);
-      } else {
-        // Partner submission
-        const response = await fetch(`${WORKER_URL}/generate-plan`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: uniqueId, partnerPreferences: preferences })
-        });
-        if (!response.ok) throw new Error('Failed to generate plan');
-        const { plan } = await response.json();
-        setDatePlan(plan);
+      const endpoint = uniqueId ? `${WORKER_URL}/generate-plan` : `${WORKER_URL}/submit-preferences`;
+      const body = uniqueId
+        ? JSON.stringify({ id: uniqueId, partnerPreferences: preferences })
+        : JSON.stringify({ preferences });
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (uniqueId) {
+        setDatePlan(data.plan);
         setPartnerSubmitted(true);
+      } else {
+        setUniqueId(data.id);
+        const newUniqueUrl = `${window.location.origin}?id=${data.id}`;
+        setUniqueUrl(newUniqueUrl);
       }
     } catch (err) {
-      setError(err.message);
+      setError(`Failed to ${uniqueId ? 'generate plan' : 'submit preferences'}: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(uniqueUrl).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset copied state after 2 seconds
-    });
-  };
+  const copyToClipboard = useCallback(() => {
+    navigator.clipboard.writeText(uniqueUrl)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(err => setError(`Failed to copy: ${err.message}`));
+  }, [uniqueUrl]);
 
-  const Option = ({ category, item, emoji, disabled = false }) => (
+  const Option = React.memo(({ category, item, emoji, disabled = false }) => (
     <button
       onClick={() => handleMultiSelect(category, item)}
       className={`p-2 m-1 rounded-full text-sm ${
@@ -109,18 +114,24 @@ const DateNightPlanner = () => {
     >
       {emoji} {item}
     </button>
-  );
+  ));
 
-  const Section = ({ title, category, options, subgroup, subgroupOptions }) => {
+  const Section = React.memo(({ title, category, options, subgroup, subgroupOptions }) => {
     const isNoScreens = category === 'watch' && preferences.watch.includes('No Screens');
-    const isEatInOrTakeOut = category === 'go' && (preferences.eat.includes('Cook Together') || preferences.eat.includes('Take Out'));
+    const isEatInOrTakeOut = category === 'location' && (preferences.eat.includes('Cook Together') || preferences.eat.includes('Take Out'));
 
     return (
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">{title}</h2>
         <div className="flex flex-wrap">
           {options.map(([item, emoji]) => (
-            <Option key={item} category={category} item={item} emoji={emoji} disabled={isEatInOrTakeOut && category === 'go' && item !== 'Home'} />
+            <Option 
+              key={item} 
+              category={category} 
+              item={item} 
+              emoji={emoji} 
+              disabled={isEatInOrTakeOut && category === 'location' && item !== 'Home'} 
+            />
           ))}
         </div>
         {subgroup && (
@@ -141,15 +152,15 @@ const DateNightPlanner = () => {
         )}
       </div>
     );
-  };
+  });
 
-  const Footer = () => (
+  const Footer = React.memo(() => (
     <footer className="text-center text-gray-400 dark:text-gray-500 text-sm mt-4 pb-4">
       <p>
         <a href="https://blog.samrhea.com/category/walkthrough/" className="hover:underline">Built with love on Cloudflare Workers</a> by <a href="https://blog.samrhea.com/pages/about/" className="hover:underline">Sam Rhea</a>.
       </p>
     </footer>
-  );
+  ));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 p-8 flex flex-col">
