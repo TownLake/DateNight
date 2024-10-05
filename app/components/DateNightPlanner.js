@@ -199,7 +199,7 @@ const DateNightPlanner = () => {
               />
               <button
                 onClick={copyToClipboard}
-                className="p-2 bg-indigo-500 text-white rounded-r-md hover:bg-indigo-600 transition-colors duration-200 flex items-center"
+                className="h-[42px] p-2 bg-indigo-500 text-white rounded-r-md hover:bg-indigo-600 transition-colors duration-200 flex items-center justify-center"
               >
                 {copied ? <Check size={20} /> : <Copy size={20} />}
                 <span className="ml-2 hidden sm:inline">{copied ? 'Copied!' : 'Copy'}</span>
