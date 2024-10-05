@@ -38,11 +38,7 @@ const DateNightPlanner = () => {
     }
   }, [preferences.watch]);
 
-  useEffect(() => {
-    if (preferences.eat.includes('Cook Together') || preferences.eat.includes('Take Out')) {
-      setPreferences(prev => ({ ...prev, location: ['Home'] }));
-    }
-  }, [preferences.eat]);
+  // Removed the effect that was changing location based on eat preferences
 
   const handleMultiSelect = useCallback((category, item) => {
     setPreferences(prev => {
@@ -140,7 +136,6 @@ const DateNightPlanner = () => {
 
   const Section = React.memo(({ title, category, options, subgroup, subgroupOptions }) => {
     const isNoScreens = category === 'watch' && preferences.watch.includes('No Screens');
-    const isEatInOrTakeOut = category === 'location' && (preferences.eat.includes('Cook Together') || preferences.eat.includes('Take Out'));
     const isNoThanksSelected = category === 'physical_connection_intimacy' && preferences.physical_connection_intimacy.includes('No Thanks');
 
     return (
@@ -153,8 +148,7 @@ const DateNightPlanner = () => {
               category={category} 
               item={item} 
               emoji={emoji} 
-              disabled={(isEatInOrTakeOut && category === 'location' && item !== 'Home') ||
-                        (isNoThanksSelected && category === 'physical_connection_intimacy' && item !== 'No Thanks')}
+              disabled={isNoThanksSelected && category === 'physical_connection_intimacy' && item !== 'No Thanks'}
             />
           ))}
         </div>
@@ -291,7 +285,7 @@ const DateNightPlanner = () => {
                 ) : (
                   <Send className="mr-2" size={20} />
                 )}
-                {isLoading ? 'Writing up a date night plan...' : 'Submit Preferences'}
+                {isLoading ? 'Planning your date night...' : 'Submit Preferences'}
               </button>
             </form>
           </>
