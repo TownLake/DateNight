@@ -188,7 +188,7 @@ const DateNightPlanner = () => {
           <>
             <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4 text-indigo-600 dark:text-indigo-400">Share with Your Partner</h1>
             <p className="text-center text-gray-600 dark:text-gray-400 mb-4">
-              Share this link with your partner:
+              Share this invitation with your partner:
             </p>
             <div className="flex items-center justify-center mb-6">
               <input
@@ -206,16 +206,16 @@ const DateNightPlanner = () => {
               </button>
             </div>
             <p className="text-center text-gray-600 dark:text-gray-400">
-              We'll generate a plan once they submit their preferences.
+              Plan-a-Date will generate a date night once they add their preferences.
             </p>
           </>
         ) : (
           <>
             <h1 className="text-3xl font-bold text-center mb-2 text-indigo-600 dark:text-indigo-400">
-              Let's Plan Date Night
+              Plan-a-Date
             </h1>
             <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
-              Select your preferences, click submit, and we'll generate a unique link for your partner to add theirs.
+              An unromantic but effective date night planner. Choose your preferences, click submit, and then share the invitation with your partner so they can submit theirs.
             </p>
             <form onSubmit={handleSubmit} className="space-y-6">
               <Section
@@ -279,7 +279,7 @@ const DateNightPlanner = () => {
                 ) : (
                   <Send className="mr-2" size={20} />
                 )}
-                {isLoading ? 'Planning your date night...' : 'Submit Preferences'}
+                {isLoading ? 'Planning your date night...' : 'Submit'}
               </button>
             </form>
           </>
